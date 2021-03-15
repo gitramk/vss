@@ -1,6 +1,11 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
+import Payment from "../views/Payment.vue";
+import Customer from "../views/Customer.vue";
+import Register from "@/views/Register.vue";
+import Token from "@/views/Token.vue";
+import RegistrationSuccessful from "@/views/RegistrationSuccessful.vue";
 
 Vue.use(VueRouter);
 
@@ -11,13 +16,33 @@ const routes = [
     component: Home,
   },
   {
-    path: "/about",
-    name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue"),
+    path: "/buy-e-token/:emailId",
+    name: "Token",
+    component: Token,
+    props: true,
+  },
+  {
+    path: "/Customer/:emailId",
+    name: "Customer",
+    component: Customer,
+    props: true,
+  },
+  {
+    path: "/Payment/:emailId",
+    name: "Payment",
+    component: Payment,
+    props: true,
+  },
+  {
+    path: "/register-your-interest",
+    name: "Register",
+    component: Register,
+  },
+  {
+    path: "/RegistrationSuccessful",
+    name: "RegistrationSuccessful",
+    component: RegistrationSuccessful,
+    props: true,
   },
 ];
 

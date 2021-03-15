@@ -1,18 +1,25 @@
 <template>
-  <v-app>
-    <v-app-bar app color="#00152c" clipped-left clipped-right dark>
-      <IneosWeb
-    /></v-app-bar>
+  <div>
+    <IneosWeb />
 
-    <v-main>
-      <v-container>
-        <router-view></router-view>
-      </v-container>
-    </v-main>
-    <v-footer color="#00152c" padless app>
-      <Footer />
-    </v-footer>
-  </v-app>
+    <router-view></router-view>
+
+    <Footer />
+    <v-app>
+      <v-dialog v-model="$store.state.isLoading" persistent fullscreen>
+        <v-container fill-height>
+          <v-layout row justify-center align-center>
+            <v-progress-circular
+              indeterminate
+              :size="70"
+              :width="7"
+              color="red"
+            ></v-progress-circular>
+          </v-layout>
+        </v-container>
+      </v-dialog>
+    </v-app>
+  </div>
 </template>
 
 <script>
@@ -27,9 +34,9 @@ export default {
     IneosWeb,
   },
 
-  data: () => ({
-    //
-  }),
+  data() {
+    return {};
+  },
 };
 </script>
-<style scoped></style>
+<style></style>

@@ -1,73 +1,54 @@
 <template>
   <main>
     <div id="content" class="container-fluid">
-      <div class="home">
-        <div class="component hero-plain col-12 m-lg-t">
-          <div class="component-content">
-            <div class="container">
-              <div class="row m-base-b">
-                <div class="col-12 col-lg-9">
-                  <h1 class="t-lg">ALL THE LATEST INEOS GRENADIER News</h1>
+      <div class=" hero hero--featured col-12">
+        <div class="component-content">
+          <div
+            class="bg hero__bg js-prlx"
+            data-paralax-max="200"
+            data-paralax-inverse="true"
+          >
+            <picture>
+              <source
+                media="(min-width: 1024px)"
+                srcset="https://mss-p-034-delivery.stylelabs.cloud/api/public/content/434414746f774d20b2c09c0ac2e0178c?v=acdb29a0"
+              />
+              <source
+                media="(min-width: 480.1px) and (max-width:1024px)"
+                srcset="https://mss-p-034-delivery.stylelabs.cloud/api/public/content/a69e9379993d491c86557b1f24463dfc?v=eb332afb"
+              />
+              <source
+                media="(max-width: 480px)"
+                srcset="https://mss-p-034-delivery.stylelabs.cloud/api/public/content/a7dd15b7553542109a829d964070ac77?v=6b520af1"
+              />
+              <img
+                style="width: 100%"
+                srcset="
+                  https://mss-p-034-delivery.stylelabs.cloud/api/public/content/a7dd15b7553542109a829d964070ac77?v=6b520af1  375w,
+                  https://mss-p-034-delivery.stylelabs.cloud/api/public/content/a69e9379993d491c86557b1f24463dfc?v=eb332afb  768w,
+                  https://mss-p-034-delivery.stylelabs.cloud/api/public/content/434414746f774d20b2c09c0ac2e0178c?v=acdb29a0 1440w
+                "
+                src="https://mss-p-034-delivery.stylelabs.cloud/api/public/content/434414746f774d20b2c09c0ac2e0178c?v=acdb29a0"
+                alt="Homepage-Hero-lrg-Gradient.jpg"
+                sizes="(max-width: 480px) 375px, 100vw, 1440px"
+              />
+            </picture>
+          </div>
+          <div
+            class="hero__content container pad-lg-tb d-flex justify-content-center align-items-center"
+          >
+            <div class="row">
+              <div
+                class="lambda-bg js-prlx"
+                data-paralax-max="200"
+                data-paralax-inverse="true"
+                data-paralax-initial-offset="100"
+              >
+                <div class="col-12">
+                  <h1 class="t-xl text-center">THE 4X4 BUILT ON PURPOSE</h1>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <div
-        class="component card card--featured pad-lg-tb bg--light-grey col-12"
-      >
-        <div class="component-content">
-          <div class="container js-animate-in animate-in">
-            <a
-              href="/en-gb/news/jue-477-wins-restoration-class"
-              class="card__link"
-              data-ga-cat="News Grid"
-              data-ga-action="Hero Article"
-              data-ga-label="JUE 477 Wins Restoration Class - READ MORE"
-              data-component-category="Layouts"
-              data-component-type="News Grid"
-              data-component-attribute="Hero Article"
-              data-component-heading="JUE 477 Wins Restoration Class"
-              data-component-label="READ MORE"
-            >
-              <div class="card__img">
-                <img
-                  stylelabs-content-id="83924"
-                  thumbnailsrc="https://ineosautomotive.stylelabs.cloud/api/gateway/83924/thumbnail"
-                  src="https://mss-p-034-delivery.stylelabs.cloud/api/public/content/abecde38ae8d429caf9c9e97602c5e2c?v=87603997"
-                  mediaid=""
-                  stylelabs-content-type="Image"
-                  alt="JUE-News-lrg.jpg"
-                  height="536"
-                  width="1200"
-                  format=""
-                />
-              </div>
-              <div class="card__text">
-                <div class="card__subheading">
-                  02 February 2021
-                  <!--<span class="card__sep">|</span> Category-->
-                </div>
-                <div class="row">
-                  <div class="col-12 col-lg-9 col-xl-8">
-                    <h3 class="card__heading t-sml text-uppercase">
-                      JUE 477 Wins Restoration Class
-                    </h3>
-                    <p class="card__desc">
-                      The Royal Automobile Club presented their annual Historic
-                      Awards last week in which JUE 477 won the Restoration
-                      Class.
-                    </p>
-                  </div>
-                  <div
-                    class="col-12 col-lg-3 ml-auto align-self-end text-lg-right mt-4 mt-lg-0"
-                  >
-                    <span class="btn btn--primary">READ MORE</span>
-                  </div>
-                </div>
-              </div>
-            </a>
           </div>
         </div>
       </div>
