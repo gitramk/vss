@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "/token/sap/opu/odata/sap/YDP_TOKEN_SRV/",
+  baseURL: "https://newportal.hinocanada.com/sap/opu/odata/sap/YDP_TOKEN_SRV/",
   withCredentials: false,
   headers: {
     Accept: "application/json",
