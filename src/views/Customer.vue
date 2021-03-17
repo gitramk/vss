@@ -57,6 +57,13 @@
           <div class="form__row form__row--required mb-3">
             <div class="d-flex flex-wrap align-items-flex-start">
               <span class="form__label form__label--inline">My name is</span>
+              <div>
+                <select class="ml-5 mr-4 form-select form-select-lg">
+                  <option selected>Mr.</option>
+                  <option value="1">Miss</option>
+                  <option value="2">Mrs.</option>
+                </select>
+              </div>
               <div class="ml-4 form__field form__field--inline">
                 <input
                   :readonly="getReadOnly"
@@ -137,7 +144,6 @@
                 :readonly="getReadOnly"
                 type="tel"
                 class="form__input form__input--text "
-                id="handraiser-email"
                 name="email"
                 maxlength="320"
                 value=""
@@ -158,6 +164,7 @@
               <legend class="d-block mb-3">
                 <span class="form__label">And here's my billing address</span>
               </legend>
+
               <div class="form__row form__row--required mb-2">
                 <label
                   class="form__label form__label--plain"
@@ -165,18 +172,25 @@
                   >Building and street name</label
                 >
                 <div class="form__field flex-fill">
-                  <input
+                  <place-autocomplete-field
+                    @autocomplete-select="onSelect"
+                    api-key="AIzaSyCkstDz48snpmiqdyQB9rp8k7hn9c7RFv0"
+                    placeholder="Enter as an address, zipcode, or location"
+                    style="min-height: 40px;"
+                    v-model="streetName"
+                    class="form__input form__input--text "
+                  />
+                  <!--  <input
                     :readonly="getReadOnly"
                     type="text"
+                    name="street"
                     class="form__input form__input--text "
-                    id="handraiser-address-1"
-                    name="addressLine1"
                     maxlength="32"
-                    v-model="streetName"
-                    @click="streetNameClicked = true"
                     style="min-height: 40px;"
-                  />
+                    v-model="streetName"
+                  /> -->
                 </div>
+
                 <div
                   class="field-validation-error"
                   v-if="streetName == '' && streetNameClicked"
@@ -346,6 +360,8 @@ export default {
     },
   },
   data: () => ({
+    field1: "",
+    fullAddress: "",
     sfData: {},
     firstName: "",
     lastName: "",
@@ -354,6 +370,7 @@ export default {
     city: "",
     state: "",
     postCode: "",
+    country: "",
     readOnly: false,
     firstNameClicked: false,
     lastNameClicked: false,
@@ -379,10 +396,27 @@ export default {
       this.city = data.Mailingcity;
       this.state = data.Mailingstate;
       this.postCode = data.Mailingpostalcode;
+      const check = await TokenService.checkOrder(this.emailId);
+      if (check.status === 200 && check.data.d.Vbeln != "") {
+        this.$router.push({
+          name: "OrderExist",
+          params: {firstName: this.firstName, lastName: this.lastName},
+        });
+      }
     }
     this.$store.dispatch("updateLoading", false);
   },
   methods: {
+    onSelect(place, response) {
+      console.log("place" + place);
+      console.log("response" + response);
+      const address = response.address_components;
+      this.streetName = address[0].short_name + " " + address[1].short_name;
+      this.city = address[3].short_name;
+      this.state = address[4].short_name;
+      this.postCode = address[6].short_name;
+      this.country = address[5].short_name;
+    },
     async buyToken() {
       if (this.readOnly) {
         this.$router.push({
@@ -390,22 +424,32 @@ export default {
           params: {emailId: this.emailId},
         });
       } else {
-        const response = await TokenService.createCustomerDetails(
-          this.firstName,
-          this.lastName,
-          this.emailId,
-          this.contactNumber,
-          this.streetName,
-          this.city,
-          this.state,
-          this.postCode
-        );
-        if (response.status == 200) {
-          this.$router.push({
-            name: "Token",
-            params: {emailId: this.emailId},
-          });
+        this.$store.dispatch("updateLoading", true);
+        try {
+          const response = await TokenService.createCustomerDetails(
+            this.firstName,
+            this.lastName,
+            this.emailId,
+            this.contactNumber,
+            this.streetName,
+            this.city,
+            this.state,
+            this.postCode,
+            this.country
+          );
+          if (response.status == 200) {
+            this.$router.push({
+              name: "Token",
+              params: {emailId: this.emailId},
+            });
+          } else {
+            console.log(response);
+          }
+        } catch (e) {
+          this.$store.dispatch("updateLoading", false);
         }
+
+        this.$store.dispatch("updateLoading", false);
       }
     },
   },
@@ -448,5 +492,14 @@ export default {
   border: 2px solid;
   padding: 20px 48px 20px 24px;
   transition: color 0.3s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+}
+.autocomplete-field > input {
+  width: 100% !important;
+}
+.autocomplete-list-wrapper {
+  color: #525252 !important;
+  font-family: Oswald, sans-serif !important;
+  font-size: 2rem !important;
+  line-height: 1.25em !important;
 }
 </style>

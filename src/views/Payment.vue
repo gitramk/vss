@@ -58,10 +58,11 @@
                   href="https://docs.adyen.com/development-resources/response-handling"
                   >Response handling.</a
                 >
+                {{ reason }}
               </span>
               <span v-else-if="type === 'failed'" class="t-md quote-plain">
                 The payment was refused. Please try a different payment method
-                or card.
+                or card. {{ reason }}
               </span>
               <span v-else-if="type === 'pending'" class="t-md quote-plain">
                 Your order has been received! Payment completion pending.
@@ -82,10 +83,10 @@
               />
             </v-col>
           </v-row>
-          <span class="t-md quote-plain ml-10 mt-10"
+          <span v-if="type === 'success'" class="t-md quote-plain ml-10 mt-10"
             >Your Grenadier is here.</span
           >
-          <div class="ml-10 mt-10">
+          <div v-if="type === 'success'" class="ml-10 mt-10">
             Please check your E-mail for next steps.
           </div>
         </div>
@@ -134,31 +135,69 @@ export default {
       const response = await PaymentService.paymentDetails(payload);
       that.refNo = response.data.pspReference;
       if (response.data.resultCode == "Authorised") {
-        that.type = "success";
-        const orderRes = await TokenService.createOrder(
-          that.emailId,
-          that.refNo
-        );
-        console.log(orderRes);
+        try {
+          const orderRes = await TokenService.createOrder(
+            that.emailId,
+            that.refNo
+          );
+          if (orderRes.status == 200) {
+            that.type = "success";
+          }
+          console.log(orderRes);
+        } catch (error) {
+          that.type = "error";
+          that.reason =
+            "Payment is successful. Something happened with backend";
+          // Error 😨
+          if (error.response) {
+            /*
+             * The request was made and the server responded with a
+             * status code that falls out of the range of 2xx
+             */
+            const message = error.response.data.error.message.value;
+            if (message.includes("Already")) {
+              that.reason =
+                " \n Congrats! You have already registered for the token";
+            } else {
+              that.reason =
+                "Payment is successful. Something happened with backend" +
+                "\n " +
+                message;
+            }
+          } else if (error.request) {
+            /*
+             * The request was made but no response was received, `error.request`
+             * is an instance of XMLHttpRequest in the browser and an instance
+             * of http.ClientRequest in Node.js
+             */
+            console.log("req" + error.request);
+          } else {
+            // Something happened in setting up the request and triggered an Error
+            console.log("Error", error.message);
+          }
+        }
+
         this.$store.dispatch("updateLoading", false);
+      } else {
+        switch (response.data.resultCode) {
+          case "Pending":
+          case "Received":
+            that.type = "pending";
+
+            break;
+          case "Refused":
+            that.type = "error";
+            that.reason = response.data.refusalReason;
+
+            break;
+          default:
+            that.type = "error";
+
+            break;
+        }
       }
       // Conditionally handle different result codes for the shopper
-      switch (response.data.resultCode) {
-        case "Pending":
-        case "Received":
-          that.type = "pending";
 
-          break;
-        case "Refused":
-          that.type = "error";
-          that.reason = response.data.refusalReason;
-
-          break;
-        default:
-          that.type = "failed";
-
-          break;
-      }
       this.$store.dispatch("updateLoading", false);
     } catch (err) {
       console.error(`Error: ${err.message}, error code: ${err.errorCode}`);

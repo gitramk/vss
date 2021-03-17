@@ -10,7 +10,7 @@ const client = new Client({config});
 client.setEnvironment("TEST");
 
 const apiClient = axios.create({
-  baseURL: "https://checkout-test.adyen.com/v67/",
+  baseURL: "/api/v67/",
   withCredentials: false,
   headers: {
     "X-API-Key": config.apiKey,

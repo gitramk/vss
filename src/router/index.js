@@ -6,6 +6,7 @@ import Customer from "../views/Customer.vue";
 import Register from "@/views/Register.vue";
 import Token from "@/views/Token.vue";
 import RegistrationSuccessful from "@/views/RegistrationSuccessful.vue";
+import OrderExist from "@/views/OrderExist.vue";
 
 Vue.use(VueRouter);
 
@@ -42,6 +43,12 @@ const routes = [
     path: "/RegistrationSuccessful",
     name: "RegistrationSuccessful",
     component: RegistrationSuccessful,
+    props: true,
+  },
+  {
+    path: "/order-exist",
+    name: "OrderExist",
+    component: OrderExist,
     props: true,
   },
 ];

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "https://newportal.hinocanada.com/sap/opu/odata/sap/YDP_TOKEN_SRV/",
+  baseURL: "/token/sap/opu/odata/sap/YDP_TOKEN_SRV/",
   withCredentials: false,
   headers: {
     Accept: "application/json",
@@ -29,15 +29,19 @@ export default {
     streetName,
     city,
     state,
-    postCode
+    postCode,
+    country
   ) {
     return apiClient.get(
-      `CreateSFContact?City='${city}'&Country='UK'&Email='${emailId}'&FirstName='${firstName}'&LastName='${lastName}'&PhoneNumber='${phoneNumber}'&PostalCode='${postCode}'&State='${state}'&Street='${streetName}'&Title=''`
+      `CreateSFContact?City='${city}'&Country='${country}'&Email='${emailId}'&FirstName='${firstName}'&LastName='${lastName}'&PhoneNumber='${phoneNumber}'&PostalCode='${postCode}'&State='${state}'&Street='${streetName}'&Title=''`
     );
   },
   createOrder(emailId, pspRef) {
     return apiClient.get(
       `CreateTokenOrder?Email='${emailId}'&Reference='${pspRef}'`
     );
+  },
+  checkOrder(emailId) {
+    return apiClient.get(`GetTokenOrder?Email='${emailId}'`);
   },
 };
