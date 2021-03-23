@@ -44,4 +44,25 @@ export default {
   checkOrder(emailId) {
     return apiClient.get(`GetTokenOrder?Email='${emailId}'`);
   },
+  createBP(emailId) {
+    return apiClient.get(`CreateSAPBP?Email='${emailId}'`);
+  },
+  getSalesPrice(bpNumber) {
+    return apiClient.get(`GetSalesPrice?Customer='${bpNumber}'`);
+  },
+  updateSalesforce(
+    firstName,
+    lastName,
+    emailId,
+    phoneNumber,
+    streetName,
+    city,
+    state,
+    postCode,
+    country
+  ) {
+    return apiClient.get(
+      `UpdateSFContact?City='${city}'&Country='${country}'&Email='${emailId}'&FirstName='${firstName}'&LastName='${lastName}'&PhoneNumber='${phoneNumber}'&PostalCode='${postCode}'&State='${state}'&Street='${streetName}'&Title=''`
+    );
+  },
 };

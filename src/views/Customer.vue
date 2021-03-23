@@ -66,7 +66,6 @@
               </div>
               <div class="ml-4 form__field form__field--inline">
                 <input
-                  :readonly="getReadOnly"
                   type="text"
                   :class="getFirstNameClass"
                   name="firstName"
@@ -86,7 +85,6 @@
               </div>
               <div class="form__field form__field--inline">
                 <input
-                  :readonly="getReadOnly"
                   type="text"
                   :class="getLastNameClass"
                   name="lastName"
@@ -137,11 +135,10 @@
             <label
               class="form__label form__label--inline"
               for="handraiser-email"
-              >My number is</label
+              >My contact number is</label
             >
             <div class="form__field flex-fill form__field--full-width-tablet">
               <input
-                :readonly="getReadOnly"
                 type="tel"
                 class="form__input form__input--text "
                 name="email"
@@ -207,7 +204,6 @@
                   >
                   <div class="form__field flex-fill">
                     <input
-                      :readonly="getReadOnly"
                       type="text"
                       class="form__input form__input--text "
                       id="handraiser-town-city"
@@ -235,7 +231,6 @@
                   >
                   <div class="form__field flex-fill">
                     <input
-                      :readonly="getReadOnly"
                       type="text"
                       class="form__input form__input--text "
                       id="handraiser-county"
@@ -265,7 +260,6 @@
                       class="form__input form__input--text "
                       id="handraiser-postcode"
                       name="postCode"
-                      :readonly="getReadOnly"
                       v-model="postCode"
                       maxlength="32"
                       style="min-height: 40px;"
@@ -360,6 +354,7 @@ export default {
     },
   },
   data: () => ({
+    BPNumber: "",
     field1: "",
     fullAddress: "",
     sfData: {},
@@ -388,6 +383,9 @@ export default {
     const data = response.data.d;
     this.sfData = data;
     if (response.status === 200 && data.Firstname) {
+      this.BPNumber = data.Name.split("BP:")[1]
+        ? data.Name.split("BP:")[1].trim()
+        : "";
       this.readOnly = true;
       this.firstName = data.Firstname;
       this.lastName = data.Lastname;
@@ -419,10 +417,32 @@ export default {
     },
     async buyToken() {
       if (this.readOnly) {
-        this.$router.push({
-          name: "Token",
-          params: {emailId: this.emailId},
-        });
+        this.$store.dispatch("updateLoading", true);
+        try {
+          const response = await TokenService.updateSalesforce(
+            this.firstName,
+            this.lastName,
+            this.emailId,
+            this.contactNumber,
+            this.streetName,
+            this.city,
+            this.state,
+            this.postCode,
+            this.country
+          );
+          if (response.status == 200) {
+            this.$router.push({
+              name: "Token",
+              params: {emailId: this.emailId, BPNumber: this.BPNumber},
+            });
+          } else {
+            console.log(response);
+          }
+        } catch (e) {
+          this.$store.dispatch("updateLoading", false);
+        }
+
+        this.$store.dispatch("updateLoading", false);
       } else {
         this.$store.dispatch("updateLoading", true);
         try {
@@ -440,7 +460,7 @@ export default {
           if (response.status == 200) {
             this.$router.push({
               name: "Token",
-              params: {emailId: this.emailId},
+              params: {emailId: this.emailId, BPNumber: this.BPNumber},
             });
           } else {
             console.log(response);

@@ -1,6 +1,6 @@
 <template>
   <v-row style="background-color:#00152c">
-    <v-col col="1" dark>
+    <v-col cols="4" dark>
       <div
         class="d-md-flex align-items-center hr-aside-bg p-2 min-vh-100"
         style='background-image: url("https://mss-p-034-delivery.stylelabs.cloud/api/public/content/ce7b4969d85047a7a11bbfef74367d81?v=0b366201");'
@@ -45,7 +45,7 @@
         </div>
       </div></v-col
     >
-    <v-col col="6">
+    <v-col cols="4">
       <div class="hero-plain col-12">
         <h1 class="ml-10 t-md hero-plain">
           Please pay to pre-book your vehicle
@@ -56,13 +56,16 @@
         <div id="dropin-container"></div>
       </v-card>
     </v-col>
-    <v-col col="1"></v-col>
+    <v-col cols="3">
+      <OrderSummary />
+    </v-col>
   </v-row>
 </template>
 
 <script>
 import PaymentService from "@/services/payment";
-
+import OrderSummary from "../components/OrderSummary.vue";
+import TokenService from "@/services/TokenService";
 let AdyenCheckout;
 AdyenCheckout = require("@adyen/adyen-web");
 // Event handlers called when the shopper selects the pay button,
@@ -120,12 +123,13 @@ function handleServerResponse(res, component) {
   }
 }
 export default {
+  components: {OrderSummary},
   data() {
     return {
       payments: [],
     };
   },
-  props: ["emailId"],
+  props: ["emailId", "BPNumber"],
   computed: {
     getActiveClass() {
       return "timeline__point isActive";
@@ -134,9 +138,20 @@ export default {
       return "timeline__highlight-point highlighted";
     },
   },
-  mounted() {
+  async mounted() {
     this.$store.dispatch("updateLoading", true);
     let clientKey = "test_YCX3NSHD3JCYJLDXABEPHEPOTIDXP7CD";
+    if (!this.BPNumber || this.BPNumber == "") {
+      try {
+        const bpRes = await TokenService.createBP(this.emailId);
+        console.log(bpRes);
+      } catch (e) {
+        this.$store.dispatch("updateLoading", false);
+      }
+    } else {
+      const salesRes = await TokenService.getSalesPrice(this.BPNumber);
+      console.log(salesRes);
+    }
     PaymentService.getPayments().then((res) => {
       const configuration = {
         paymentMethodsResponse: filterUnimplemented(res),

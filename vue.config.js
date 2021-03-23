@@ -8,12 +8,12 @@ module.exports = {
 
         pathRewrite: {"^/api": "/"},
       },
-      "^/token":{
-        target: "https://newportal.hinocanada.com",
+      "^/token": {
+        target: "http://inau-s4h-d1.in3.ad.innovene.com:8000/",
         changeOrigin: true,
 
         pathRewrite: {"^/token": "/"},
-      }
+      },
     },
   },
   configureWebpack: {
