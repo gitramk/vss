@@ -18,8 +18,7 @@ export default {
     );
   },
   getCustomerDetails(emailId) {
-    // return apiClient.get("SFContacts");
-    return apiClient.get(`FindSFContact?EmailAddress='${emailId}'`);
+    return apiClient.get(`FindSFLead?EmailAddress='${emailId}'`);
   },
   createCustomerDetails(
     firstName,
@@ -62,7 +61,7 @@ export default {
     country
   ) {
     return apiClient.get(
-      `UpdateSFContact?City='${city}'&Country='${country}'&Email='${emailId}'&FirstName='${firstName}'&LastName='${lastName}'&PhoneNumber='${phoneNumber}'&PostalCode='${postCode}'&State='${state}'&Street='${streetName}'&Title=''`
+      `UpdateSFLead?City='${city}'&Country='${country}'&Email='${emailId}'&FirstName='${firstName}'&LastName='${lastName}'&PhoneNumber='${phoneNumber}'&PostalCode='${postCode}'&State='${state}'&Street='${streetName}'&Title=''`
     );
   },
 };

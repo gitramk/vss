@@ -19,14 +19,14 @@
           <v-list-item-title>Grenadier Token </v-list-item-title>
 
           <v-list-item-subtitle class="text-right">
-            €350
+            € {{ getNetValue }}
           </v-list-item-subtitle>
         </v-list-item>
         <v-list-item>
           <v-list-item-title>Tax </v-list-item-title>
 
           <v-list-item-subtitle class="text-right">
-            €100
+            € {{ getTax }}
           </v-list-item-subtitle>
         </v-list-item>
         <v-divider></v-divider>
@@ -34,7 +34,7 @@
           <v-list-item-title>Total </v-list-item-title>
 
           <v-list-item-subtitle class="text-right">
-            €450
+            € {{ getTotal }}
           </v-list-item-subtitle>
         </v-list-item>
       </v-list>
@@ -48,6 +48,18 @@ export default {
     return {
       show: false,
     };
+  },
+
+  computed: {
+    getTax() {
+      return this.$store.state.salesPrice.tax;
+    },
+    getNetValue() {
+      return this.$store.state.salesPrice.netValue;
+    },
+    getTotal() {
+      return this.$store.state.salesPrice.totalValue;
+    },
   },
 };
 </script>

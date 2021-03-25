@@ -127,10 +127,15 @@ export default {
   data() {
     return {
       payments: [],
+      BPNumber: "",
+      salesPriceModel: {},
     };
   },
-  props: ["emailId", "BPNumber"],
+  props: ["emailId"],
   computed: {
+    getBPNumber() {
+      return this.$store.state.BPNumber;
+    },
     getActiveClass() {
       return "timeline__point isActive";
     },
@@ -141,52 +146,57 @@ export default {
   async mounted() {
     this.$store.dispatch("updateLoading", true);
     let clientKey = "test_YCX3NSHD3JCYJLDXABEPHEPOTIDXP7CD";
-    if (!this.BPNumber || this.BPNumber == "") {
-      try {
-        const bpRes = await TokenService.createBP(this.emailId);
-        console.log(bpRes);
-      } catch (e) {
-        this.$store.dispatch("updateLoading", false);
-      }
-    } else {
-      const salesRes = await TokenService.getSalesPrice(this.BPNumber);
-      console.log(salesRes);
-    }
-    PaymentService.getPayments().then((res) => {
-      const configuration = {
-        paymentMethodsResponse: filterUnimplemented(res),
-        clientKey,
-        locale: "en_US",
-        environment: "test",
-        showPayButton: true,
-        paymentMethodsConfiguration: {
-          ideal: {
-            showImage: true,
-          },
-          card: {
-            hasHolderName: true,
-            holderNameRequired: true,
-            name: "Credit or debit card",
-            amount: {
-              value: 45000,
-              currency: "EUR",
+
+    try {
+      const salesRes = await TokenService.getSalesPrice(
+        this.$store.state.bpNumber
+      );
+      const salesPrice = salesRes.data.d;
+      this.salesPriceModel.tax = parseFloat(salesPrice.CondValue1);
+      this.salesPriceModel.netValue = parseFloat(salesPrice.CondValue2);
+      this.salesPriceModel.totalValue =
+        parseFloat(this.salesPriceModel.tax) +
+        parseFloat(this.salesPriceModel.netValue);
+      this.$store.dispatch("setSalesPrice", this.salesPriceModel);
+      PaymentService.getPayments().then((res) => {
+        const configuration = {
+          paymentMethodsResponse: filterUnimplemented(res),
+          clientKey,
+          locale: "en_US",
+          environment: "test",
+          showPayButton: true,
+          paymentMethodsConfiguration: {
+            ideal: {
+              showImage: true,
+            },
+            card: {
+              hasHolderName: true,
+              holderNameRequired: true,
+              name: "Credit or debit card",
+              amount: {
+                value: this.salesPriceModel.totalValue * 100,
+                currency: "EUR",
+              },
             },
           },
-        },
-        onSubmit: (state, component) => {
-          if (state.isValid) {
-            handleSubmission(state, component, "payments", this.emailId);
-          }
-        },
-        onAdditionalDetails: (state, component) => {
-          handleSubmission(state, component, "submitAdditionalDetails");
-        },
-      };
+          onSubmit: (state, component) => {
+            if (state.isValid) {
+              handleSubmission(state, component, "payments", this.emailId);
+            }
+          },
+          onAdditionalDetails: (state, component) => {
+            handleSubmission(state, component, "submitAdditionalDetails");
+          },
+        };
 
-      const checkout = new AdyenCheckout(configuration);
-      checkout.create("dropin").mount("#dropin-container");
+        const checkout = new AdyenCheckout(configuration);
+        checkout.create("dropin").mount("#dropin-container");
+        this.$store.dispatch("updateLoading", false);
+      });
+    } catch (e) {
+      console.log("Error" + e);
       this.$store.dispatch("updateLoading", false);
-    });
+    }
   },
 };
 </script>

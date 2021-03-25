@@ -383,23 +383,26 @@ export default {
     const data = response.data.d;
     this.sfData = data;
     if (response.status === 200 && data.Firstname) {
-      this.BPNumber = data.Name.split("BP:")[1]
-        ? data.Name.split("BP:")[1].trim()
-        : "";
+      this.BPNumber = data.Suffix;
       this.readOnly = true;
       this.firstName = data.Firstname;
       this.lastName = data.Lastname;
       this.contactNumber = data.Phone;
-      this.streetName = data.Mailingstreet;
-      this.city = data.Mailingcity;
-      this.state = data.Mailingstate;
-      this.postCode = data.Mailingpostalcode;
-      const check = await TokenService.checkOrder(this.emailId);
-      if (check.status === 200 && check.data.d.Vbeln != "") {
-        this.$router.push({
-          name: "OrderExist",
-          params: {firstName: this.firstName, lastName: this.lastName},
-        });
+      this.streetName = data.Street;
+      this.city = data.City;
+      this.state = data.State;
+      this.postCode = data.Postalcode;
+      this.$store.dispatch("setBPNumber", this.BPNumber);
+      try {
+        const check = await TokenService.checkOrder(this.emailId);
+        if (check.status === 200 && check.data.d.Vbeln != "") {
+          this.$router.push({
+            name: "OrderExist",
+            params: {firstName: this.firstName, lastName: this.lastName},
+          });
+        }
+      } catch (e) {
+        console.log(e);
       }
     }
     this.$store.dispatch("updateLoading", false);
@@ -409,11 +412,19 @@ export default {
       console.log("place" + place);
       console.log("response" + response);
       const address = response.address_components;
-      this.streetName = address[0].short_name + " " + address[1].short_name;
+      this.streetName =
+        address[0].short_name +
+        " " +
+        address[1].short_name +
+        " " +
+        address[2].short_name;
       this.city = address[3].short_name;
       this.state = address[4].short_name;
-      this.postCode = address[6].short_name;
-      this.country = address[5].short_name;
+
+      this.country =
+        address.length > 7 ? address[6].short_name : address[5].short_name;
+      this.postCode =
+        address.length > 7 ? address[7].short_name : address[6].short_name;
     },
     async buyToken() {
       if (this.readOnly) {
@@ -431,45 +442,25 @@ export default {
             this.country
           );
           if (response.status == 200) {
-            this.$router.push({
-              name: "Token",
-              params: {emailId: this.emailId, BPNumber: this.BPNumber},
-            });
+            TokenService.createBP(this.emailId)
+              .then((bpRes) => {
+                this.$store.dispatch("setBPNumber", bpRes.data.d.Partner);
+                this.$router.push({
+                  name: "Token",
+                  params: {emailId: this.emailId},
+                });
+                this.$store.dispatch("updateLoading", false);
+              })
+              .catch((error) => {
+                console.log(error);
+                this.$store.dispatch("updateLoading", false);
+              });
           } else {
-            console.log(response);
+            console.log("Error:" + response);
           }
         } catch (e) {
           this.$store.dispatch("updateLoading", false);
         }
-
-        this.$store.dispatch("updateLoading", false);
-      } else {
-        this.$store.dispatch("updateLoading", true);
-        try {
-          const response = await TokenService.createCustomerDetails(
-            this.firstName,
-            this.lastName,
-            this.emailId,
-            this.contactNumber,
-            this.streetName,
-            this.city,
-            this.state,
-            this.postCode,
-            this.country
-          );
-          if (response.status == 200) {
-            this.$router.push({
-              name: "Token",
-              params: {emailId: this.emailId, BPNumber: this.BPNumber},
-            });
-          } else {
-            console.log(response);
-          }
-        } catch (e) {
-          this.$store.dispatch("updateLoading", false);
-        }
-
-        this.$store.dispatch("updateLoading", false);
       }
     },
   },

@@ -220,18 +220,23 @@ export default {
   methods: {
     async register() {
       this.$store.dispatch("updateLoading", true);
-      const response = await TokenService.sendEmailRegistration(
-        this.emailId,
-        this.firstName,
-        this.lastName
-      );
-      this.$store.dispatch("updateLoading", false);
-      if (response.status === 200) {
-        this.$router.push({
-          name: "RegistrationSuccessful",
-          params: {firstName: this.firstName, lastName: this.lastName},
-        });
+      try {
+        const response = await TokenService.sendEmailRegistration(
+          this.emailId,
+          this.firstName,
+          this.lastName
+        );
+        if (response.status === 200) {
+          this.$router.push({
+            name: "RegistrationSuccessful",
+            params: {firstName: this.firstName, lastName: this.lastName},
+          });
+        }
+      } catch (e) {
+        this.$store.dispatch("updateLoading", false);
       }
+
+      this.$store.dispatch("updateLoading", false);
     },
     getValidEmail(event) {
       const v = event;
