@@ -112,9 +112,11 @@
             </div>
             <div
               class="field-validation-error"
-              v-if="!getValidEmail(emailId) && emailClicked"
+              v-if="
+                (!getValidEmail(emailId) && emailClicked) || isAlreadyRegistered
+              "
             >
-              {{ getErrorText(emailId) }}
+              {{ getErrorText(emailId, isAlreadyRegistered) }}
             </div>
           </div>
           <div class="custom-control-lg custom-control custom-checkbox">
@@ -214,11 +216,13 @@ export default {
     lastNameClicked: false,
     emailClicked: false,
     orgEmailClicked: false,
+    isAlreadyRegistered: false,
     emailValidationError: "Please add an email address",
   }),
 
   methods: {
     async register() {
+      let that = this;
       this.$store.dispatch("updateLoading", true);
       try {
         const response = await TokenService.sendEmailRegistration(
@@ -232,7 +236,18 @@ export default {
             params: {firstName: this.firstName, lastName: this.lastName},
           });
         }
-      } catch (e) {
+      } catch (error) {
+        if (error.response) {
+          /*
+           * The request was made and the server responded with a
+           * status code that falls out of the range of 2xx
+           */
+          const message = error.response.data.error.message.value;
+          if (message.includes("Already")) {
+            that.isAlreadyRegistered = true;
+          }
+          console.log(message);
+        }
         this.$store.dispatch("updateLoading", false);
       }
 
@@ -251,11 +266,13 @@ export default {
         return false;
       }
     },
-    getErrorText(v) {
+    getErrorText(v, isExist) {
       if (!v) {
         return "Please add an email address";
-      } else if (/.+@.+\..+/.test(v)) {
+      } else if (/.+@.+\..+/.test(v) && !isExist) {
         return "";
+      } else if (isExist) {
+        return "Mail id is already registered with us. Please check your mail for instructions to buy E-Token";
       } else {
         return "Check email format";
       }
